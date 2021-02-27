@@ -1,2 +1,3 @@
 impact_data/
 build/
+*/__pycache__/

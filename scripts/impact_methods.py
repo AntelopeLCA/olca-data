@@ -9,6 +9,8 @@ LCIA_DIR = os.path.join(BASE_DIR, 'LCIA method', 'categories')
 
 LciaMethod = namedtuple('LciaMethod', ('IMPACT_CATEGORY_UUID', 'FILENAME', 'IMPACT_METHOD', 'IMPACT_CATEGORY', 'REFERENCE_UNIT'))
 
+LCIA_METHODS_FILENAME = 'impact_categories'
+
 
 class EmptyMethod(Exception):
     pass
