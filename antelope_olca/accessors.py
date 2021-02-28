@@ -158,8 +158,16 @@ def read_unit_groups():
         for k in u['SYNONYMS'].split(';'):
             dd['units'][k] = factor
 
-    # may need to do some munging here (i.e. 1/x)
+    '''
+    OLCA's approach puts all the units in terms of a stated reference (which is the standard bearing, to be sure);; 
+    but my preferred approach (which is different from all the world) is that each entry in the unit conversion dict 
+    refers to the SAME TRUE MAGNITUDE, such that it is not necessary to know which is the reference unit.  
+    This requires me to invert the entries and scale them by the ref unit.  I'M SORRY- I know it's annoying to be
+    different but it does make unit conversion more reliable.
+    '''
+    for dd in ug_dict.values():
+        unit = dd['units'][dd['ref_unit']]
+        for k, v in dd['units'].items():
+            dd['units'][k] = unit / v
 
     return ug_dict
-
-

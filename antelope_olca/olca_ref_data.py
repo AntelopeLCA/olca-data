@@ -74,7 +74,7 @@ class OpenLcaRefData(BasicArchive):
                 fp = self[flow['REF_QTY']]
                 if fp is None:
                     raise KeyError('Flow: %s: unknown ref quantity %s' % (flow['UUID'], flow['REF_QTY']))
-                cx = self.tm.add_context(self._olca_contexts[flow['CAT_UUID']])
+                cx = self._olca_contexts[flow['CAT_UUID']]
                 f = LcFlow(flow['UUID'], Name=flow['FLOW_NAME'], context=cx, FLOW_TYPE=flow['FLOW_TYPE'],
                            entity_uuid=flow['UUID'],
                            CasNumber=flow['CAS_NUMBER'], Formula=flow['FORMULA'], ReferenceQuantity=fp)
