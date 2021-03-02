@@ -22,21 +22,20 @@ class FlowMapper(object):
             return x.flow
         return x
 
+    @staticmethod
+    def _contextof(x):
+        if x.entity_type == 'exchange':
+            return x.termination or x.flow.context
+        return x.context
+
+
     def _run_x(self, x, use=None):
         if x in self.hit:
             self.dup.append(x)
             return
+        flow = self._flowof(x)
+        term = self._contextof(x)
 
-        if x.entity_type == 'flow':
-            flow = x
-            term = x.context
-        elif x.entity_type == 'exchange':
-            flow = x.flow
-            term = x.termination
-            if term is None:
-                term = flow.context
-        else:
-            raise TypeError
         if use is None:
             mf = self.tm.get_flowable(flow)  # else, raise KeyError
         else:
@@ -116,7 +115,7 @@ class FlowMapper(object):
         self._unmap = set()  # hit entries for which context can't be mapped to flow
         self._badref = set()  # hit entries for which no matching flows have the same reference entity
 
-        self.mapped = dict()  # {input: entity that the term manager knows}
+        self.mapped = dict()  # {input flow: entity that the term manager knows}
         self._ambiguous = dict()  # {input: [entities] where no or multiple string names match exactly}
 
         if flows:
@@ -147,9 +146,11 @@ class FlowMapper(object):
         if _fo in self.mapped:
             return self.mapped[_fo]
         elif x in self._ambiguous:
-            raise TooManyDaves(_fo)
+            raise TooManyDaves(_fo.name)
         elif x in self._badref:
-            raise ReferenceEntityMismatch(x)
+            raise ReferenceEntityMismatch(_fo.link)
+        elif x in self._unmap:
+            raise ContextNotFound(self._contextof(x))
         else:
             raise KeyError
 
@@ -259,7 +260,7 @@ class FlowMapper(object):
 
     def first(self, u=None, n=0):
         if u:
-            return self._ambiguous[u][n]
+            return self._ambiguous[u][n:n+1]
         else:
             return [self.first(am, n) for am in self._ambiguous.keys()]
 
